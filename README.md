@@ -48,7 +48,7 @@ The primary goals of this chatbot are to:
 
 4. Run the application:
    ```
-   python main.py --api-key YOUR_ANTHROPIC_API_KEY
+   python therabot.py --api-key YOUR_ANTHROPIC_API_KEY
    ```
 
 5. Open a web browser and navigate to `http://localhost:8000` to access the chatbot interface.
