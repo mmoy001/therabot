@@ -1,7 +1,7 @@
 import os
 import argparse
 from fastapi import FastAPI, Request, Form, Depends, Cookie
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from anthropic import AsyncAnthropic
@@ -10,6 +10,8 @@ from contextlib import asynccontextmanager
 import aiohttp
 import uuid
 import uvicorn
+import json
+import asyncio
 
 # Global variable to store the Anthropic client
 anthropic_client = None
@@ -74,7 +76,7 @@ async def new_context(session: str = Depends(get_user_session)):
     user_contexts[session] = []
     return {"message": "New chat session started. Welcome!"}
 
-# Route for chatting with Anthropic API
+# Route for chatting with Anthropic API (streaming)
 @app.post("/chat")
 async def chat_to_anthropic(
     message: str = Form(...),
@@ -87,28 +89,32 @@ async def chat_to_anthropic(
     # Prune context if necessary
     user_contexts[session] = prune_context(user_contexts[session])
     
-    try:
-        # Call Anthropic API with full context
-        response = await client.messages.create(
-            model="claude-3-sonnet-20240229",
-            messages=user_contexts[session],
-            max_tokens=1000,
-        )
-        
-        # Add assistant response to context
-        assistant_message = response.content[0].text
-        user_contexts[session].append({"role": "assistant", "content": assistant_message})
-        
-        # Prune context again after adding assistant response
-        user_contexts[session] = prune_context(user_contexts[session])
-        
-        # Set the session ID as a cookie in the response
-        response = JSONResponse(content={"response": assistant_message})
-        response.set_cookie(key="session_id", value=session)
-        return response
-    except Exception as e:
-        print(f"Error calling Anthropic API: {str(e)}")
-        return {"response": "Error: Unable to get a response from the AI. Please try again."}
+    async def event_generator():
+        try:
+            # Call Anthropic API with streaming
+            async with client.messages.stream(
+                model="claude-3-sonnet-20240229",
+                messages=user_contexts[session],
+                max_tokens=1000,
+            ) as stream:
+                full_response = ""
+                async for chunk in stream:
+                    if chunk.type == "content_block_delta":
+                        full_response += chunk.delta.text
+                        yield f"data: {json.dumps({'delta': chunk.delta.text})}\n\n"
+                
+                # After streaming is complete, add the full response to the context
+                user_contexts[session].append({"role": "assistant", "content": full_response})
+                
+                # Prune context again after adding assistant response
+                user_contexts[session] = prune_context(user_contexts[session])
+                
+                yield f"data: {json.dumps({'done': True})}\n\n"
+        except Exception as e:
+            print(f"Error calling Anthropic API: {str(e)}")
+            yield f"data: {json.dumps({'error': str(e)})}\n\n"
+
+    return StreamingResponse(event_generator(), media_type="text/event-stream")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run the FastAPI server with Anthropic API key")
