@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', initializeChat);
 const sendButton = document.getElementById('send-btn');
 const userInput = document.getElementById('user-input');
 const messagesContainer = document.getElementById('messages');
+const chatWindow = document.getElementById('chat-window');
 
 sendButton.addEventListener('click', sendMessage);
 userInput.addEventListener('keydown', (event) => {
@@ -98,5 +99,34 @@ function addMessage(sender, content) {
 }
 
 function scrollToBottom() {
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    // Use requestAnimationFrame for smooth scrolling
+    requestAnimationFrame(() => {
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+    });
 }
+
+// Debounce function for smoother scrolling during rapid updates
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+// Use debounced scroll function for smoother performance
+const debouncedScrollToBottom = debounce(scrollToBottom, 100);
+
+// Add event listener for resize to adjust scroll
+window.addEventListener('resize', debouncedScrollToBottom);
+
+// Ensure scrolling when the window is resized
+window.addEventListener('resize', debouncedScrollToBottom);
+
+// Ensure scrolling when new content is added (for dynamically loaded content)
+const observer = new MutationObserver(debouncedScrollToBottom);
+observer.observe(messagesContainer, { childList: true, subtree: true });

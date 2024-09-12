@@ -1,6 +1,6 @@
 :root {
     --color-bg: #f5f5f5;
-    --color-primary: #0084ff;
+    --color-primary: #0066cc; /* Darkened for better contrast */
     --color-secondary: #4a4a4a;
     --color-accent: #2ecc71;
     --color-error: #e74c3c;
@@ -12,9 +12,11 @@ body, html {
     margin: 0;
     padding: 0;
     height: 100%;
-    font-family: 'Inter', Arial, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
     background-color: var(--color-bg);
     color: var(--color-text);
+    line-height: 1.5; /* Improved line height for better readability */
+    font-size: 16px; /* Base font size */
 }
 
 #chat-container {
@@ -42,6 +44,9 @@ header {
     border-radius: 15px;
     overflow: hidden;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 #logo {
@@ -74,8 +79,8 @@ header h1 {
     margin-bottom: 15px;
     padding: 12px 15px;
     border-radius: 18px;
-    font-size: 0.95rem;
-    line-height: 1.4;
+    font-size: 1rem; /* Slightly increased for better readability */
+    line-height: 1.5;
     box-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
 
@@ -115,13 +120,14 @@ header h1 {
     padding: 12px 15px;
     border: 1px solid #d1d1d1;
     border-radius: 25px;
-    font-size: 16px;
+    font-size: 1rem;
     outline: none;
     transition: border-color 0.2s;
 }
 
 #user-input:focus {
     border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.2); /* Added focus indicator for accessibility */
 }
 
 #send-btn {
@@ -132,15 +138,21 @@ header h1 {
     border: none;
     border-radius: 25px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 1rem;
     transition: background-color 0.2s;
 }
 
-#send-btn:hover {
-    background-color: #0066cc;
+#send-btn:hover, #send-btn:focus {
+    background-color: #005bb5; /* Darkened for better contrast on hover/focus */
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.2); /* Added focus indicator for accessibility */
 }
 
 @media (max-width: 600px) {
+    body, html {
+        font-size: 14px; /* Slightly smaller base font size for mobile */
+    }
+
     #chat-container {
         height: 100vh;
         max-width: 100%;

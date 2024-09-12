@@ -46,7 +46,8 @@ templates = Jinja2Templates(directory="templates")
 user_contexts: Dict[str, List[Dict[str, str]]] = {}
 
 # Dependency to get or create a user session
-async def get_user_session(session_id: Optional[str] = Cookie(None)):
+async def get_user_session(request: Request):
+    session_id = request.cookies.get("session_id")
     if not session_id or session_id not in user_contexts:
         session_id = str(uuid.uuid4())
         user_contexts[session_id] = []
@@ -114,7 +115,10 @@ async def chat_to_anthropic(
             print(f"Error calling Anthropic API: {str(e)}")
             yield f"data: {json.dumps({'error': str(e)})}\n\n"
 
-    return StreamingResponse(event_generator(), media_type="text/event-stream")
+    response = StreamingResponse(event_generator(), media_type="text/event-stream")
+    response.set_cookie(key="session_id", value=session)
+    return response
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run the FastAPI server with Anthropic API key")
