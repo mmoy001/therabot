@@ -1,12 +1,13 @@
 document.addEventListener('DOMContentLoaded', initializeChat);
 
-document.getElementById('send-btn').addEventListener('click', async () => {
-    await sendMessage();
-});
+const sendButton = document.getElementById('send-btn');
+const userInput = document.getElementById('user-input');
+const messagesContainer = document.getElementById('messages');
 
-document.getElementById('user-input').addEventListener('keydown', async (event) => {
+sendButton.addEventListener('click', sendMessage);
+userInput.addEventListener('keydown', (event) => {
     if (event.key === 'Enter') {
-        await sendMessage();
+        sendMessage();
     }
 });
 
@@ -18,33 +19,21 @@ async function initializeChat() {
         }
         const data = await response.json();
         
-        const messageContainer = document.getElementById('messages');
-        const welcomeMessage = document.createElement('div');
-        welcomeMessage.className = 'message system';
-        welcomeMessage.innerText = data.message;
-        messageContainer.appendChild(welcomeMessage);
+        addMessage('system', data.message);
     } catch (error) {
         console.error('Error:', error);
-        const errorMessage = document.createElement('div');
-        errorMessage.className = 'message system error';
-        errorMessage.innerText = "Error: Unable to start a new chat session.";
-        messageContainer.appendChild(errorMessage);
+        addMessage('error', "Error: Unable to start a new chat session.");
     }
+    userInput.focus();
 }
 
 async function sendMessage() {
-    const userInput = document.getElementById('user-input').value;
-    if (userInput.trim() === "") return;
+    const message = userInput.value.trim();
+    if (message === "") return;
 
-    const messageContainer = document.getElementById('messages');
-    
-    // Display the user's message
-    const userMessage = document.createElement('div');
-    userMessage.className = 'message user';
-    userMessage.innerText = "You: " + userInput;
-    messageContainer.appendChild(userMessage);
+    addMessage('user', message);
+    userInput.value = '';
 
-    // Send the user's message to the backend
     try {
         const response = await fetch('/chat', {
             method: 'POST',
@@ -52,7 +41,7 @@ async function sendMessage() {
                 'Content-Type': 'application/x-www-form-urlencoded',
             },
             body: new URLSearchParams({
-                'message': userInput
+                'message': message
             })
         });
 
@@ -61,23 +50,23 @@ async function sendMessage() {
         }
 
         const data = await response.json();
-
-        // Display Claude's response
-        const botMessage = document.createElement('div');
-        botMessage.className = 'message bot';
-        botMessage.innerText = "Claude: " + data.response;
-        messageContainer.appendChild(botMessage);
+        addMessage('bot', data.response);
     } catch (error) {
         console.error('Error:', error);
-        const errorMessage = document.createElement('div');
-        errorMessage.className = 'message bot error';
-        errorMessage.innerText = "Error: Unable to get response from the server.";
-        messageContainer.appendChild(errorMessage);
+        addMessage('error', "Error: Unable to get response from the server.");
     }
 
-    // Clear the input field
-    document.getElementById('user-input').value = '';
+    userInput.focus();
+}
 
-    // Scroll to the bottom of the chat
-    messageContainer.scrollTop = messageContainer.scrollHeight;
+function addMessage(sender, content) {
+    const messageElement = document.createElement('div');
+    messageElement.className = `message ${sender}`;
+    messageElement.textContent = content;
+    messagesContainer.appendChild(messageElement);
+    scrollToBottom();
+}
+
+function scrollToBottom() {
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
