@@ -68,10 +68,10 @@ async def chat_to_anthropic(
                         yield f"data: {json.dumps({'delta': delta_text})}\n\n"
 
                 # Consistency check
-                if not is_response_consistent(full_response, context["patient_profile"]):
-                    correction = generate_consistent_response(context["patient_profile"])
-                    full_response = f"I apologize for any confusion. {correction}"
-                    yield f"data: {json.dumps({'delta': full_response})}\n\n"
+                #if not is_response_consistent(full_response, context["patient_profile"]):
+                    #correction = generate_consistent_response(context["patient_profile"])
+                #    full_response = f"I apologize for any confusion. {correction}"
+                #    yield f"data: {json.dumps({'delta': full_response})}\n\n"
 
                 # Store only the original message and AI's response in the context
                 context["messages"][-1]["content"] = message  # Replace augmented message with original
