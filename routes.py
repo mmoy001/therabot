@@ -46,18 +46,26 @@ async def chat_to_anthropic(
     # Generate patient reminder
     patient_reminder = generate_patient_reminder(context["patient_profile"])
 
-    # Inject the patient reminder into the user's message
-    augmented_message = f"{patient_reminder}\n\nUser: {message}\n\nYour response:"
+    # Instead of injecting the reminder into the user's message, we'll use it as a system message
+    system_message = f"{context['system_prompt']}\n\n{patient_reminder}"
 
-    context["messages"].append({"role": "user", "content": augmented_message})
-    context["messages"] = prune_context(context["messages"])
+    # Prepare the messages for the API call
+    api_messages = []
+    for msg in context["messages"]:
+        if msg["role"] == "user":
+            api_messages.append({"role": "user", "content": msg["content"]})
+        elif msg["role"] == "assistant":
+            api_messages.append({"role": "assistant", "content": msg["content"]})
+
+    # Add the new user message
+    api_messages.append({"role": "user", "content": message})
 
     async def event_generator():
         try:
-           async with client.messages.stream(
+            async with client.messages.stream(
                 model="claude-3-sonnet-20240229",
-                system=context["system_prompt"],
-                messages=context["messages"],
+                system=system_message,
+                messages=api_messages,
                 max_tokens=1000,
             ) as stream:
                 full_response = ""
@@ -69,12 +77,12 @@ async def chat_to_anthropic(
 
                 # Consistency check
                 #if not is_response_consistent(full_response, context["patient_profile"]):
-                    #correction = generate_consistent_response(context["patient_profile"])
+                #    correction = generate_consistent_response(context["patient_profile"])
                 #    full_response = f"I apologize for any confusion. {correction}"
                 #    yield f"data: {json.dumps({'delta': full_response})}\n\n"
 
-                # Store only the original message and AI's response in the context
-                context["messages"][-1]["content"] = message  # Replace augmented message with original
+                # Store the original message and AI's response in the context
+                context["messages"].append({"role": "user", "content": message})
                 context["messages"].append({"role": "assistant", "content": full_response})
                 context["messages"] = prune_context(context["messages"])
 

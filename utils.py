@@ -13,7 +13,10 @@ def generate_patient_profile():
     age = random.randint(*disorder_info["age_range"])
     gender = random.choice(["Male", "Female"])
     name = random.choice(
-        ["Alex", "Jordan", "Taylor", "Casey", "Riley", "Morgan", "Jamie", "Cameron"]
+        ["Alex", "Jordan", "Taylor", "Casey", "Riley", "Morgan", "Jamie", "Cameron", "Avery",
+        "Quinn", "Skylar", "Charlie", "Frankie", "Finley", "Emerson", "Sage", "Remy", "Parker",
+        "Hayden", "Drew", "Phoenix", "River", "Sawyer", "Rowan", "Blair", "Kendall", "Marlowe",
+        "Harper", "Reese", "Dakota"]
     )
     symptoms = random.sample(disorder_info["symptoms"], k=len(disorder_info["symptoms"]))
 
