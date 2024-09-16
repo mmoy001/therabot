@@ -16,6 +16,8 @@ import json
 
 app_routes = APIRouter()
 
+disclaimer = "https://docs.google.com/document/d/1lDNbDQSgLv94GA7abUYuzrLegKHob4L2Ai5Y7_B09hA/edit?usp=sharing"
+
 @app_routes.get("/", response_class=HTMLResponse)
 async def get_chat_page(request: Request):
     return templates.TemplateResponse("chat.html", {"request": request})
@@ -32,7 +34,13 @@ async def new_context(session: str = Depends(get_user_session)):
     }
 
     return {
-        "message": "New chat session started. Please begin the intake interview."
+        "message": [
+            "By continuing to use this LLM chat application, you agree to our terms and conditions.",
+            "If you do not agree, please discontinue use immediately.",
+            "",
+            "New chat session started. Please begin the intake interview."
+        ],
+        "disclaimer_url": disclaimer
     }
 
 @app_routes.post("/chat")

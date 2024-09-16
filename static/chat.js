@@ -20,7 +20,22 @@ async function initializeChat() {
         }
         const data = await response.json();
         
-        addMessage('system', data.message);
+        let formattedMessage = '';
+        if (Array.isArray(data.message)) {
+            formattedMessage = data.message.map((line, index) => {
+                if (index === 0 && data.disclaimer_url) {
+                    return line.replace(
+                        "terms and conditions",
+                        `<a href="${data.disclaimer_url}" target="_blank">terms and conditions</a>`
+                    );
+                }
+                return line;
+            }).join('<br>');
+        } else {
+            formattedMessage = data.message;
+        }
+        
+        addMessage('system', formattedMessage, true);
     } catch (error) {
         console.error('Error:', error);
         addMessage('error', "Error: Unable to start a new chat session.");
@@ -90,16 +105,19 @@ async function sendMessage() {
     userInput.focus();
 }
 
-function addMessage(sender, content) {
+function addMessage(sender, content, isHTML = false) {
     const messageElement = document.createElement('div');
     messageElement.className = `message ${sender}`;
-    messageElement.textContent = content;
+    if (isHTML) {
+        messageElement.innerHTML = content;
+    } else {
+        messageElement.textContent = content;
+    }
     messagesContainer.appendChild(messageElement);
     scrollToBottom();
 }
 
 function scrollToBottom() {
-    // Use requestAnimationFrame for smooth scrolling
     requestAnimationFrame(() => {
         chatWindow.scrollTop = chatWindow.scrollHeight;
     });
