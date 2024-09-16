@@ -16,7 +16,7 @@ import json
 
 app_routes = APIRouter()
 
-disclaimer = "https://docs.google.com/document/d/1lDNbDQSgLv94GA7abUYuzrLegKHob4L2Ai5Y7_B09hA/edit?usp=sharing"
+disclaimer = "https://docs.google.com/document/d/1lDNbDQSgLv94GA7abUYuzrLegKHob4L2Ai5Y7_B09hA/view"
 
 @app_routes.get("/", response_class=HTMLResponse)
 async def get_chat_page(request: Request):
