@@ -4,6 +4,7 @@ const sendButton = document.getElementById('send-btn');
 const userInput = document.getElementById('user-input');
 const messagesContainer = document.getElementById('messages');
 const chatWindow = document.getElementById('chat-window');
+const printButton = document.getElementById('print-btn');
 
 sendButton.addEventListener('click', sendMessage);
 userInput.addEventListener('keydown', (event) => {
@@ -11,6 +12,7 @@ userInput.addEventListener('keydown', (event) => {
         sendMessage();
     }
 });
+printButton.addEventListener('click', printConversation);
 
 async function initializeChat() {
     try {
@@ -121,6 +123,74 @@ function scrollToBottom() {
     requestAnimationFrame(() => {
         chatWindow.scrollTop = chatWindow.scrollHeight;
     });
+}
+
+function printConversation() {
+    const messages = messagesContainer.children;
+    let printContent = `
+    <html>
+    <head>
+        <title>Print Conversation</title>
+        <style>
+            body { font-family: 'Inter', sans-serif; padding: 20px; }
+            h1 { text-align: center; }
+            .conversation { max-width: 800px; margin: 0 auto; }
+            .message { margin-bottom: 15px; }
+            .message.user { text-align: right; }
+            .message.bot { text-align: left; }
+            .message.system { text-align: center; font-style: italic; }
+            .message.error { color: red; }
+            .message strong { display: block; margin-bottom: 5px; }
+        </style>
+    </head>
+    <body>
+        <h1>TheraBot - Conversation</h1>
+        <div class="conversation">
+    `;
+
+    // Loop through messages and add them to printContent
+    for (let i = 0; i < messages.length; i++) {
+        const messageElement = messages[i];
+        const senderClass = messageElement.className;
+        let sender = '';
+
+        if (senderClass.includes('user')) {
+            sender = 'User';
+        } else if (senderClass.includes('bot')) {
+            sender = 'TheraBot';
+        } else if (senderClass.includes('system')) {
+            sender = 'System';
+        } else if (senderClass.includes('error')) {
+            sender = 'Error';
+        } else {
+            sender = 'Unknown';
+        }
+
+        const content = messageElement.innerHTML;
+        printContent += `
+        <div class="message ${senderClass}">
+            <strong>${sender}:</strong> ${content}
+        </div>
+        `;
+    }
+
+    printContent += `
+        </div>
+    </body>
+    </html>
+    `;
+
+    // Open a new window and write the printable content
+    const printWindow = window.open('', '', 'height=600,width=800');
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+    printWindow.focus();
+
+    // Wait for the content to load before printing
+    printWindow.onload = function() {
+        printWindow.print();
+        printWindow.close();
+    };
 }
 
 // Debounce function for smoother scrolling during rapid updates

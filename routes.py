@@ -8,7 +8,9 @@ from utils import (
     is_response_consistent,
     generate_consistent_response,
     generate_patient_profile,
+    generate_patient_summary,
     create_system_prompt,
+    new_user_context,
 )
 from anthropic_client import get_anthropic_client
 from anthropic import AsyncAnthropic
@@ -24,21 +26,25 @@ async def get_chat_page(request: Request):
 
 @app_routes.post("/new-context")
 async def new_context(session: str = Depends(get_user_session)):
-    patient_profile = generate_patient_profile()
-    system_prompt = create_system_prompt(patient_profile)
-
-    user_contexts[session] = {
-        "messages": [],
-        "patient_profile": patient_profile,
-        "system_prompt": system_prompt,
-    }
+    user_context = await new_user_context()
+    user_contexts[session] = user_context
+    print(user_context['patient_profile']['name'])
+    patient_profile = user_context["patient_profile"]
 
     return {
         "message": [
             "By continuing to use this LLM chat application, you agree to our terms and conditions.",
             "If you do not agree, please discontinue use immediately.",
             "",
-            "New chat session started. Please begin the intake interview."
+            "New chat session started. Please begin the intake interview.",
+            "",
+            "Patient Profile:",
+            f"Name: {patient_profile['name']}",
+            f"Age: {patient_profile['age']} years old",
+            f"Sex: {patient_profile['gender']}",
+            "",
+            "Note: This patient is experiencing symptoms consistent with a mental health condition. "
+            "Proceed with the intake interview to gather more information."
         ],
         "disclaimer_url": disclaimer
     }

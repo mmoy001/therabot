@@ -16,7 +16,9 @@ def generate_patient_profile():
         ["Alex", "Jordan", "Taylor", "Casey", "Riley", "Morgan", "Jamie", "Cameron", "Avery",
         "Quinn", "Skylar", "Charlie", "Frankie", "Finley", "Emerson", "Sage", "Remy", "Parker",
         "Hayden", "Drew", "Phoenix", "River", "Sawyer", "Rowan", "Blair", "Kendall", "Marlowe",
-        "Harper", "Reese", "Dakota"]
+        "Harper", "Reese", "Dakota", "Jadin", "Ash", "Casey", "Ainsley", "Ariel", "Angel", "Addison",
+        "Aspen", "Deven", "Julian", "Jesse", "Terry", "London", "Max", "Morgan", "Noel", "Pat",
+        "Peyton", "Ray", "Reagan", "Riley", "Roan", "Sam", "Shae", "Tate", "Tony"]
     )
     symptoms = random.sample(disorder_info["symptoms"], k=len(disorder_info["symptoms"]))
 
@@ -28,6 +30,34 @@ def generate_patient_profile():
         "symptoms": symptoms,
     }
 
+def generate_patient_summary(patient_profile):
+    """Generates a brief summary of the patient for the interviewer (student) to read before the session starts."""
+    summary = (
+        f"Patient Profile:\n"
+        f"Name: {patient_profile['name']}\n"
+        f"Age: {patient_profile['age']} years old\n"
+        f"Sex: {patient_profile['gender']}\n\n"
+        "Note: This patient is experiencing symptoms consistent with a mental health condition. "
+        "Please proceed with the intake interview and gather more information as appropriate."
+    )
+    return summary
+
+async def new_user_context():
+    patient_profile = generate_patient_profile()
+    system_prompt = create_system_prompt(patient_profile)
+    patient_summary = generate_patient_summary(patient_profile)  # Generate the patient summary
+    user_context = {
+        "messages": [{"role": "system", "content": patient_summary}],  # Start the session with the summary
+        "patient_profile": patient_profile,
+        "system_prompt": system_prompt,
+    }
+    print("PATIENT NAME: ", patient_profile['name'])
+    return user_context
+
+async def get_user_session(request: Request):
+    session_id = request.cookies.get("session_id")
+    return session_id
+
 def create_system_prompt(patient_profile):
     prompt = f"""
 You are role-playing as {patient_profile['name']}, a {patient_profile['age']}-year-old {patient_profile['gender'].lower()}.
@@ -38,19 +68,31 @@ Your symptoms include:
     for symptom in patient_profile['symptoms']:
         prompt += f"- {symptom}\n"
 
-    prompt += """
-During this intake interview, respond as {name} would, exhibiting behaviors and communication styles consistent with your symptoms.
+    prompt += f"""
+During this intake interview, respond as {patient_profile['name']} would, exhibiting behaviors and communication styles consistent with your symptoms.
 Stay in character throughout the conversation.
 
-IMPORTANT:
-- You should not mention your diagnosis by name or use clinical terms to describe your condition.
-- Express your experiences and feelings in layman's terms, as someone who is seeking help but doesn't have a medical understanding of their condition.
-- Your responses should reflect the symptoms and experiences typical of your condition, but from a personal, non-clinical perspective.
+At the beginning of the interview, you feel hesitant and cautious about sharing personal information.
+You may provide brief or vague responses initially.
+As the interviewer builds rapport and you feel more comfortable, gradually open up and share more details about your experiences and feelings.
 
-The interviewer will ask you questions as part of a clinical intake interview. Provide responses that are appropriate for your experiences, keeping in mind that this is likely your first time seeking professional help.
-""".format(
-        name=patient_profile["name"]
-    )
+IMPORTANT:
+- Do not mention your diagnosis by name or use clinical terms to describe your condition.
+- Express your experiences and feelings in layman's terms, as someone who is seeking help but doesn't have a medical understanding of their condition.
+- Avoid volunteering detailed information unless specifically asked.
+- Your initial responses should reflect a level of guardedness appropriate for someone meeting a clinician for the first time.
+- As trust develops, allow your responses to become more detailed and revealing, consistent with your symptoms.
+- Try to imitate natural spoken dialog, which means using short responses most often and long responses only as appropiate and as rapport builds. For example, not every response requires more than a sentence or two.
+- It is important that while playing the role of a patient you do not become a caricature. Always remember you are a full, complex person, not just the disorder. 
+
+The interviewer will ask you questions as part of a clinical intake interview.
+Provide responses that are appropriate for your experiences, keeping in mind that this is likely your first time seeking professional help.
+
+Additionally, remember that {patient_profile['name']} may:
+- Feel nervous about the interview and will not want to share information.
+- Require reassurance or gentle prompting to feel comfortable opening up.
+- Respond positively to empathetic and non-judgmental questions from the interviewer.
+"""
     return prompt.strip()
 
 def generate_patient_reminder(patient_profile):
@@ -97,19 +139,6 @@ def generate_consistent_response(patient_profile):
         )
 
     return response
-
-async def get_user_session(request: Request):
-    session_id = request.cookies.get("session_id")
-    if not session_id or session_id not in user_contexts:
-        session_id = str(uuid.uuid4())
-        patient_profile = generate_patient_profile()
-        system_prompt = create_system_prompt(patient_profile)
-        user_contexts[session_id] = {
-            "messages": [],
-            "patient_profile": patient_profile,
-            "system_prompt": system_prompt,
-        }
-    return session_id
 
 def prune_context(context: List[Dict[str, str]]) -> List[Dict[str, str]]:
     if len(context) > MAX_CONTEXT_LENGTH:

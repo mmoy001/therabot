@@ -6,98 +6,194 @@ user_contexts: Dict[str, Dict] = {}
 templates = Jinja2Templates(directory="templates")
 
 disorders = {
-    "ADHD": {
-        "age_range": (4, 65),
+    # Neurodevelopmental Disorders
+    "Autism Spectrum Disorder": {
+        "age_range": (12, 15),
         "symptoms": [
-            "fails to give close attention to details or makes careless mistakes",
-            "difficulty sustaining attention in tasks or play activities",
-            "does not seem to listen when spoken to directly",
-            "often fidgets with or taps hands or feet",
-            "difficulty organizing tasks and activities",
-            "often interrupts or intrudes on others",
+            "difficulty with social interactions",
+            "challenges in communication",
+            "repetitive behaviors",
+            "restricted interests",
+            "resistance to changes in routine",
         ],
     },
-    "Oppositional Defiant Disorder": {
-        "age_range": (5, 17),
+    "Attention-Deficit/Hyperactivity Disorder (ADHD)": {
+        "age_range": (12, 40),
         "symptoms": [
-            "often loses temper",
-            "is often touchy or easily annoyed",
-            "is often angry and resentful",
-            "often argues with authority figures or adults",
-            "often actively defies or refuses to comply with requests",
-            "often deliberately annoys others",
-            "often blames others for their mistakes or misbehavior",
-            "has been spiteful or vindictive at least twice in the past six months",
+            "difficulty sustaining attention in tasks",
+            "impulsivity and acting without thinking",
+            "hyperactivity or restlessness",
+            "difficulty organizing tasks and activities",
+            "frequent forgetfulness in daily activities",
+        ],
+    },
+
+    # Disruptive, Impulse Control, and Conduct Disorders
+    "Oppositional Defiant Disorder": {
+        "age_range": (12, 18),
+        "symptoms": [
+            "frequent temper tantrums or anger outbursts",
+            "arguing with authority figures",
+            "deliberately annoying others",
+            "blaming others for their mistakes or misbehavior",
+            "resentful or vindictive behavior",
         ],
     },
     "Antisocial Personality Disorder": {
         "age_range": (18, 65),
         "symptoms": [
-            "failure to conform to social norms with respect to lawful behaviors",
-            "deceitfulness, as indicated by repeated lying or conning others",
-            "impulsivity or failure to plan ahead",
-            "irritability and aggressiveness, often leading to physical fights",
-            "reckless disregard for safety of self or others",
-            "consistent irresponsibility",
+            "disregard for the rights of others",
+            "repeated violation of societal norms and laws",
+            "impulsive and aggressive behavior",
             "lack of remorse after harming others",
+            "manipulation and deceit for personal gain",
         ],
     },
-    "Schizophrenia": {
-        "age_range": (16, 65),
-        "symptoms": [
-            "delusions (e.g., persecutory or grandiose delusions)",
-            "hallucinations",
-            "disorganized speech",
-            "grossly disorganized or catatonic behavior",
-            "negative symptoms (e.g., diminished emotional expression)",
-        ],
-    },
-    "Substance-Induced Psychotic Disorder": {
-        "age_range": (15, 65),
-        "symptoms": [
-            "presence of hallucinations or delusions",
-            "symptoms developed during or soon after substance intoxication or withdrawal",
-            "the substance used is capable of producing such symptoms",
-            "psychotic symptoms not exclusive to delirium",
-            "impairment in social or occupational functioning",
-        ],
-    },
-    "Opioid Use Disorder": {
+
+    # Schizophrenia Spectrum and Other Psychotic Disorders
+    "Schizophrenia with Paranoid Delusions": {
         "age_range": (18, 65),
         "symptoms": [
-            "opioids taken in larger amounts or over a longer period than intended",
-            "persistent desire or unsuccessful efforts to cut down or control use",
-            "great deal of time spent obtaining, using, or recovering from opioids",
-            "craving or strong desire to use opioids",
-            "recurrent use resulting in failure to fulfill major role obligations",
-            "continued use despite social or interpersonal problems",
-            "important activities given up or reduced because of use",
-            "tolerance and withdrawal symptoms",
+            "persistent delusions, particularly of persecution",
+            "auditory or visual hallucinations",
+            "disorganized thinking or speech",
+            "social withdrawal and isolation",
+            "heightened suspicion or mistrust of others",
         ],
     },
-    "Autism Spectrum Disorder": {
-        "age_range": (2, 15),
+
+    # Bipolar and Related Disorders
+    "Bipolar Disorder": {
+        "age_range": (18, 65),
         "symptoms": [
-            "deficits in social-emotional reciprocity",
-            "deficits in nonverbal communicative behaviors",
-            "deficits in developing and maintaining relationships",
-            "restricted, repetitive patterns of behavior or speech",
-            "highly restricted, fixated interests",
-            "hyper- or hyporeactivity to sensory input",
+            "extreme mood swings from high energy to low energy",
+            "periods of elevated mood (mania) with increased activity",
+            "periods of depression with low mood and energy",
+            "impulsive behavior during manic episodes",
+            "difficulty maintaining stable relationships",
         ],
     },
+
+    # Depressive Disorders
     "Major Depressive Disorder": {
         "age_range": (18, 65),
         "symptoms": [
-            "depressed mood most of the day, nearly every day",
-            "markedly diminished interest or pleasure in all activities",
-            "significant weight loss when not dieting or weight gain",
-            "insomnia or hypersomnia nearly every day",
-            "psychomotor agitation or retardation",
-            "fatigue or loss of energy nearly every day",
-            "feelings of worthlessness or excessive guilt",
-            "diminished ability to think or concentrate",
-            "recurrent thoughts of death or suicidal ideation",
+            "persistent feelings of sadness",
+            "loss of interest in activities",
+            "fatigue",
+            "difficulty concentrating",
+            "changes in sleep patterns",
+        ],
+    },
+    "Persistent Depressive Disorder (Dysthymia)": {
+        "age_range": (18, 65),
+        "symptoms": [
+            "long-term (2+ years) low mood",
+            "lack of energy and motivation",
+            "feelings of hopelessness",
+            "difficulty making decisions",
+            "low self-esteem",
+        ],
+    },
+
+    # Anxiety Disorders
+    "Generalized Anxiety Disorder (GAD)": {
+        "age_range": (18, 65),
+        "symptoms": [
+            "excessive worry about various aspects of life",
+            "restlessness or feeling on edge",
+            "difficulty concentrating",
+            "muscle tension",
+            "sleep disturbances",
+        ],
+    },
+    "Panic Disorder": {
+        "age_range": (18, 50),
+        "symptoms": [
+            "unexpected panic attacks",
+            "intense fear or discomfort during attacks",
+            "fear of having another panic attack",
+            "avoidance of situations associated with panic",
+            "physical symptoms such as sweating or heart palpitations",
+        ],
+    },
+
+    # Obsessive-Compulsive and Related Disorders
+    "Obsessive-Compulsive Disorder (OCD)": {
+        "age_range": (12, 50),
+        "symptoms": [
+            "recurrent, intrusive thoughts or images (obsessions)",
+            "repetitive behaviors or rituals (compulsions)",
+            "feelings of distress or anxiety when unable to perform compulsions",
+            "excessive focus on order or cleanliness",
+            "avoiding situations that trigger obsessions",
+        ],
+    },
+
+    # Trauma- and Stressor-Related Disorders
+    "Post-Traumatic Stress Disorder (PTSD)": {
+        "age_range": (18, 65),
+        "symptoms": [
+            "recurrent distressing memories or flashbacks of trauma",
+            "avoidance of reminders associated with the trauma",
+            "heightened startle response",
+            "feelings of detachment or emotional numbness",
+            "difficulty sleeping or concentrating",
+        ],
+    },
+    "Acute Stress Disorder": {
+        "age_range": (18, 65),
+        "symptoms": [
+            "severe anxiety after a traumatic event",
+            "recurrent distressing dreams or flashbacks",
+            "feelings of detachment or unreality",
+            "inability to concentrate or complete tasks",
+            "avoidance of activities or places that remind of trauma",
+        ],
+    },
+
+    # Dissociative Disorders
+    "Dissociative Identity Disorder (DID)": {
+        "age_range": (18, 65),
+        "symptoms": [
+            "presence of two or more distinct personality states",
+            "gaps in memory for everyday events or personal information",
+            "sense of detachment or being outside oneself",
+            "difficulty remembering traumatic events",
+            "sudden mood or behavior changes without clear cause",
+        ],
+    },
+    "Dissociative Amnesia": {
+        "age_range": (18, 65),
+        "symptoms": [
+            "inability to recall important personal information",
+            "memory loss that is inconsistent with normal forgetting",
+            "feeling detached from one's surroundings",
+            "confusion about identity or history",
+            "stress or confusion when trying to recall memories",
+        ],
+    },
+
+    # Substance Abuse and Addictive Disorders
+    "Substance-Induced Psychotic Disorder, Opioid Use Disorder and Violence": {
+        "age_range": (18, 65),
+        "symptoms": [
+            "paranoia and delusions related to substance use",
+            "aggressive or violent outbursts",
+            "erratic behavior when under the influence",
+            "intense cravings for opioids",
+            "withdrawal symptoms when not using",
+        ],
+    },
+    "Alcohol Use Disorder": {
+        "age_range": (18, 65),
+        "symptoms": [
+            "difficulty controlling drinking behavior",
+            "cravings for alcohol",
+            "continued use despite negative consequences",
+            "neglecting responsibilities due to alcohol use",
+            "physical symptoms of withdrawal when not drinking",
         ],
     },
 }
+

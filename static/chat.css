@@ -167,3 +167,26 @@ header h1 {
         font-size: 1.5rem;
     }
 }
+
+#print-btn {
+    padding: 12px 20px;
+    background-color: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.2s;
+    margin: 10px 0; /* Add some margin to separate it from the header */
+}
+
+#print-btn:hover, #print-btn:focus {
+    background-color: #005bb5; /* Darkened for better contrast on hover/focus */
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.2); /* Focus indicator for accessibility */
+}
+
+.button-container {
+    text-align: center;
+    margin-top: 10px;
+}
