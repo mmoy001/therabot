@@ -77,7 +77,7 @@ async def chat_to_anthropic(
     async def event_generator():
         try:
             async with client.messages.stream(
-                model="claude-3-sonnet-20240229",
+                model="claude-sonnet-4-5-20250929",
                 system=system_message,
                 messages=api_messages,
                 max_tokens=1000,
